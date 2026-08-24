@@ -14,7 +14,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN
+from .const import DOMAIN, MAX_TASK_ATTRIBUTES
 from .coordinator import HoldsportDataUpdateCoordinator
 
 
@@ -226,7 +226,7 @@ class HoldsportTeamNextActivitySensor(HoldsportTeamBaseEntity):
             "action_path": activity.get("action_path"),
             "rides": activity.get("rides", []),
             "ride_comment": activity.get("ride_comment"),
-            "tasks": tasks.get(activity_id, [])[:10],
+            "tasks": tasks.get(activity_id, [])[:MAX_TASK_ATTRIBUTES],
             "tasks_count": len(tasks.get(activity_id, [])),
             "activities_count": len(
                 self.coordinator.data.get("activities", {}).get(self._team_id, [])

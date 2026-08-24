@@ -90,9 +90,6 @@ class HoldsportConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class HoldsportOptionsFlow(config_entries.OptionsFlow):
     """Options flow for Holdsport."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        self.config_entry = config_entry
-
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         """Manage options."""
         if user_input is not None:

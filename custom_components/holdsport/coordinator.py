@@ -9,6 +9,7 @@ from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt as dt_util
 
 from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN
 from .holdsport_api import HoldsportApiClient, HoldsportApiError
@@ -54,10 +55,16 @@ class HoldsportDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         tasks_map: dict[str, list[dict[str, Any]]] = {}
         activity_ids: list[str] = []
         task_coroutines: list[Any] = []
+        now = dt_util.utcnow()
         for activity in activities:
             activity_id = activity.get("id")
             if activity_id is None:
                 continue
+            start_time_str = activity.get("starttime")
+            if start_time_str:
+                start_time = dt_util.parse_datetime(start_time_str)
+                if start_time is not None and dt_util.as_utc(start_time) < now:
+                    continue
             activity_ids.append(str(activity_id))
             task_coroutines.append(
                 _safe("activity_tasks", self.client.async_get_activity_tasks(int(activity_id)))
