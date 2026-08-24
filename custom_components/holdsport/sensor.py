@@ -71,7 +71,7 @@ class HoldsportUserSensor(HoldsportBaseEntity):
 
     def __init__(self, coordinator: HoldsportDataUpdateCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry)
-        self._attr_name = "User"
+        self._attr_translation_key = "user_name"
         self._attr_unique_id = f"{entry.entry_id}_user"
 
     @property
@@ -108,6 +108,17 @@ class HoldsportTeamBaseEntity(HoldsportBaseEntity):
         self._team = team
         self._team_id = str(team["id"])
 
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return team device info."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, f"{self._entry.entry_id}_{self._team_id}")},
+            name=self._team.get("name", f"Team {self._team_id}"),
+            manufacturer="Holdsport",
+            model="Team",
+            via_device=(DOMAIN, self._entry.entry_id),
+        )
+
 
 class HoldsportTeamMetricSensor(HoldsportTeamBaseEntity):
     """Sensor exposing counts for team collections."""
@@ -121,7 +132,7 @@ class HoldsportTeamMetricSensor(HoldsportTeamBaseEntity):
     ) -> None:
         super().__init__(coordinator, entry, team)
         self._metric = metric
-        self._attr_name = f"{self._team.get('name')} {metric.capitalize()} count"
+        self._attr_translation_key = f"team_{metric}_count"
         self._attr_unique_id = f"{entry.entry_id}_{self._team_id}_{metric}_count"
 
     @property
@@ -149,7 +160,7 @@ class HoldsportTeamNextActivitySensor(HoldsportTeamBaseEntity):
         team: dict[str, Any],
     ) -> None:
         super().__init__(coordinator, entry, team)
-        self._attr_name = f"{self._team.get('name')} Next activity"
+        self._attr_translation_key = "team_next_activity"
         self._attr_unique_id = f"{entry.entry_id}_{self._team_id}_next_activity"
 
     def _next_activity(self) -> dict[str, Any] | None:
@@ -189,7 +200,12 @@ class HoldsportTeamNextActivitySensor(HoldsportTeamBaseEntity):
             return {
                 "team_id": int(self._team_id),
                 "team_name": self._team.get("name"),
-                "activities": self.coordinator.data.get("activities", {}).get(self._team_id, []),
+                "team_role": self._team.get("role"),
+                "activities_count": len(
+                    self.coordinator.data.get("activities", {}).get(self._team_id, [])
+                ),
+                "members_count": len(self.coordinator.data.get("members", {}).get(self._team_id, [])),
+                "notes_count": len(self.coordinator.data.get("notes", {}).get(self._team_id, [])),
             }
 
         activity_id = str(activity.get("id"))
@@ -210,8 +226,11 @@ class HoldsportTeamNextActivitySensor(HoldsportTeamBaseEntity):
             "action_path": activity.get("action_path"),
             "rides": activity.get("rides", []),
             "ride_comment": activity.get("ride_comment"),
-            "tasks": tasks.get(activity_id, []),
-            "activities": self.coordinator.data.get("activities", {}).get(self._team_id, []),
-            "members": self.coordinator.data.get("members", {}).get(self._team_id, []),
-            "notes": self.coordinator.data.get("notes", {}).get(self._team_id, []),
+            "tasks": tasks.get(activity_id, [])[:10],
+            "tasks_count": len(tasks.get(activity_id, [])),
+            "activities_count": len(
+                self.coordinator.data.get("activities", {}).get(self._team_id, [])
+            ),
+            "members_count": len(self.coordinator.data.get("members", {}).get(self._team_id, [])),
+            "notes_count": len(self.coordinator.data.get("notes", {}).get(self._team_id, [])),
         }

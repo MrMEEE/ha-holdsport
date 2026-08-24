@@ -84,9 +84,16 @@ class HoldsportDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             notes: dict[str, list[dict[str, Any]]] = {}
             activity_tasks: dict[str, dict[str, list[dict[str, Any]]]] = {}
 
+            team_ids: list[int] = []
+            team_coroutines: list[Any] = []
             for team in teams:
                 team_id = int(team["id"])
-                payload = await self._async_team_payload(team_id)
+                team_ids.append(team_id)
+                team_coroutines.append(self._async_team_payload(team_id))
+
+            team_payloads = await asyncio.gather(*team_coroutines)
+
+            for team_id, payload in zip(team_ids, team_payloads, strict=True):
                 team_key = str(team_id)
                 activities[team_key] = payload["activities"]
                 members[team_key] = payload["members"]
