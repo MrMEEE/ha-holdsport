@@ -81,6 +81,22 @@ class HoldsportApiClient:
             params={"page": page, "per_page": per_page},
         )
 
+    async def async_get_all_activities(
+        self, team_id: int, *, per_page: int = 50
+    ) -> list[dict[str, Any]]:
+        """Fetch all pages of team activities."""
+        activities: list[dict[str, Any]] = []
+        page = 1
+
+        while True:
+            activity_page = await self.async_get_activities(
+                team_id, page=page, per_page=per_page
+            )
+            activities.extend(activity_page)
+            if len(activity_page) < per_page:
+                return activities
+            page += 1
+
     async def async_get_members(self, team_id: int) -> list[dict[str, Any]]:
         """Fetch team members."""
         return await self._request("GET", f"{API_PREFIX}/teams/{team_id}/members")

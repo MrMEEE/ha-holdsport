@@ -10,13 +10,14 @@ DEFAULT_UPDATE_INTERVAL = 15
 BASE_URL = "https://api.holdsport.dk"
 API_PREFIX = "/v1"
 
-PLATFORMS = ["sensor"]
+PLATFORMS = ["calendar", "sensor"]
 
 SERVICE_EXECUTE_ACTIVITY_ACTION = "execute_activity_action"
 SERVICE_ADD_ACTIVITY_COMMENT = "add_activity_comment"
 SERVICE_ADD_ACTIVITY_RIDE = "add_activity_ride"
 SERVICE_REMOVE_ACTIVITY_RIDE = "remove_activity_ride"
 SERVICE_ASSIGN_ACTIVITY_TASK = "assign_activity_task"
+SERVICE_REFRESH = "refresh"
 MAX_TASK_ATTRIBUTES = 10
 
 ATTR_ENTRY_ID = "entry_id"

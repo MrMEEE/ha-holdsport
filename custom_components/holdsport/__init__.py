@@ -31,6 +31,7 @@ from .const import (
     SERVICE_ADD_ACTIVITY_RIDE,
     SERVICE_ASSIGN_ACTIVITY_TASK,
     SERVICE_EXECUTE_ACTIVITY_ACTION,
+    SERVICE_REFRESH,
     SERVICE_REMOVE_ACTIVITY_RIDE,
 )
 from .coordinator import HoldsportDataUpdateCoordinator
@@ -43,6 +44,7 @@ _SERVICES = (
     SERVICE_ADD_ACTIVITY_RIDE,
     SERVICE_REMOVE_ACTIVITY_RIDE,
     SERVICE_ASSIGN_ACTIVITY_TASK,
+    SERVICE_REFRESH,
 )
 
 SERVICE_EXECUTE_SCHEMA = vol.Schema(
@@ -81,6 +83,11 @@ SERVICE_ASSIGN_TASK_SCHEMA = vol.Schema(
         vol.Required(ATTR_ACTIVITY_ID): vol.Coerce(int),
         vol.Required(ATTR_TASK_TYPE_ID): vol.Coerce(int),
         vol.Optional(ATTR_USER_ID): vol.Coerce(int),
+    }
+)
+SERVICE_REFRESH_SCHEMA = vol.Schema(
+    {
+        vol.Optional(ATTR_ENTRY_ID): cv.string,
     }
 )
 
@@ -158,6 +165,10 @@ def _find_activity(
 def _register_services(hass: HomeAssistant) -> None:
     """Register Holdsport services."""
 
+    async def handle_refresh(call: ServiceCall) -> None:
+        coordinator = await _get_coordinator(hass, call.data.get(ATTR_ENTRY_ID))
+        await coordinator.async_request_refresh()
+
     async def handle_execute_action(call: ServiceCall) -> None:
         coordinator = await _get_coordinator(hass, call.data.get(ATTR_ENTRY_ID))
         team_id = call.data[ATTR_TEAM_ID]
@@ -215,6 +226,12 @@ def _register_services(hass: HomeAssistant) -> None:
         except HoldsportApiError as err:
             raise HomeAssistantError(f"Failed to assign activity task: {err}") from err
 
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_REFRESH,
+        handle_refresh,
+        schema=SERVICE_REFRESH_SCHEMA,
+    )
     hass.services.async_register(
         DOMAIN,
         SERVICE_EXECUTE_ACTIVITY_ACTION,

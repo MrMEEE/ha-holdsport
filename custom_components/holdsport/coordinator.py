@@ -49,7 +49,7 @@ class HoldsportDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 return []
 
         activities, members, notes = await asyncio.gather(
-            _safe("activities", self.client.async_get_activities(team_id)),
+            _safe("activities", self.client.async_get_all_activities(team_id)),
             _safe("members", self.client.async_get_members(team_id)),
             _safe("notes", self.client.async_get_notes(team_id)),
         )

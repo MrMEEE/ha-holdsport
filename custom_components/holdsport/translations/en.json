@@ -21,6 +21,11 @@
     }
   },
   "entity": {
+    "calendar": {
+      "team_calendar": {
+        "name": "Calendar"
+      }
+    },
     "sensor": {
       "user_name": {
         "name": "User"

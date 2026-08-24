@@ -1,3 +1,12 @@
+refresh:
+  name: Refresh Holdsport data
+  description: Fetch the latest data from Holdsport immediately.
+  fields:
+    entry_id:
+      required: false
+      selector:
+        text:
+
 execute_activity_action:
   name: Execute activity action
   description: Execute one of the currently available actions for a team activity.

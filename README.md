@@ -16,7 +16,11 @@ Holdsport integration for Home Assistant (HACS custom integration).
   - user profile sensor
   - per-team next activity sensor (with detailed attributes)
   - per-team activity/member/note count sensors
+- Calendars:
+  - per-team calendars containing all activities returned by Holdsport, including training,
+    tournaments, and department activities
 - Services:
+  - `holdsport.refresh`
   - `holdsport.execute_activity_action`
   - `holdsport.add_activity_comment`
   - `holdsport.add_activity_ride`
@@ -45,3 +49,7 @@ Holdsport integration for Home Assistant (HACS custom integration).
 
 - Data is fetched from `https://api.holdsport.dk/v1`.
 - Update interval is configurable in the integration options.
+- Use the native team calendar entities in Calendar, Agenda, or Calendar List cards. Calendar
+  events are read-only; use the Holdsport services for RSVPs, comments, rides, and tasks.
+- Call `holdsport.refresh` to fetch data immediately. With multiple configured accounts, provide
+  the optional config-entry ID to refresh a specific account.
