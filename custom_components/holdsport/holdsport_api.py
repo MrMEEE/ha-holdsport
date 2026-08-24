@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from typing import Any
 
 import aiohttp
@@ -51,13 +52,18 @@ class HoldsportApiClient:
                         raise HoldsportApiError(
                             f"Holdsport API error {response.status} for {path}: {body}"
                         )
-                    if response.status == 204:
+                    if response.status == 204 or response.content_length == 0:
                         return None
-                    return await response.json(content_type=None)
+                    body = await response.text()
+                    if not body.strip():
+                        return None
+                    return json.loads(body)
         except aiohttp.ClientError as err:
             raise HoldsportApiError(f"Connection error: {err}") from err
         except TimeoutError as err:
             raise HoldsportApiError("Request to Holdsport timed out") from err
+        except json.JSONDecodeError as err:
+            raise HoldsportApiError(f"Invalid JSON response from Holdsport: {err}") from err
 
     async def async_get_user(self) -> dict[str, Any]:
         """Fetch current user profile."""

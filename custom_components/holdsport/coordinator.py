@@ -48,9 +48,11 @@ class HoldsportDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 _LOGGER.warning("Unable to fetch %s for team %s: %s", call_name, team_id, err)
                 return []
 
-        activities = await _safe("activities", self.client.async_get_activities(team_id))
-        members = await _safe("members", self.client.async_get_members(team_id))
-        notes = await _safe("notes", self.client.async_get_notes(team_id))
+        activities, members, notes = await asyncio.gather(
+            _safe("activities", self.client.async_get_activities(team_id)),
+            _safe("members", self.client.async_get_members(team_id)),
+            _safe("notes", self.client.async_get_notes(team_id)),
+        )
 
         tasks_map: dict[str, list[dict[str, Any]]] = {}
         activity_ids: list[str] = []

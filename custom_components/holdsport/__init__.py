@@ -37,6 +37,13 @@ from .coordinator import HoldsportDataUpdateCoordinator
 from .holdsport_api import HoldsportApiClient, HoldsportApiError
 
 _LOGGER = logging.getLogger(__name__)
+_SERVICES = (
+    SERVICE_EXECUTE_ACTIVITY_ACTION,
+    SERVICE_ADD_ACTIVITY_COMMENT,
+    SERVICE_ADD_ACTIVITY_RIDE,
+    SERVICE_REMOVE_ACTIVITY_RIDE,
+    SERVICE_ASSIGN_ACTIVITY_TASK,
+)
 
 SERVICE_EXECUTE_SCHEMA = vol.Schema(
     {
@@ -93,7 +100,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_config_entry_first_refresh()
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
-    if not hass.services.has_service(DOMAIN, SERVICE_EXECUTE_ACTIVITY_ACTION):
+    if _services_missing(hass):
         _register_services(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -242,12 +249,11 @@ def _register_services(hass: HomeAssistant) -> None:
 
 def _remove_services(hass: HomeAssistant) -> None:
     """Remove Holdsport services."""
-    for service in (
-        SERVICE_EXECUTE_ACTIVITY_ACTION,
-        SERVICE_ADD_ACTIVITY_COMMENT,
-        SERVICE_ADD_ACTIVITY_RIDE,
-        SERVICE_REMOVE_ACTIVITY_RIDE,
-        SERVICE_ASSIGN_ACTIVITY_TASK,
-    ):
+    for service in _SERVICES:
         if hass.services.has_service(DOMAIN, service):
             hass.services.async_remove(DOMAIN, service)
+
+
+def _services_missing(hass: HomeAssistant) -> bool:
+    """Check if any Holdsport service is missing."""
+    return any(not hass.services.has_service(DOMAIN, service) for service in _SERVICES)
