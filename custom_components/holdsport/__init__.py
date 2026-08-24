@@ -112,6 +112,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
+        if not hass.data[DOMAIN]:
+            _remove_services(hass)
+            hass.data.pop(DOMAIN)
     return unload_ok
 
 
@@ -235,3 +238,16 @@ def _register_services(hass: HomeAssistant) -> None:
         handle_assign_task,
         schema=SERVICE_ASSIGN_TASK_SCHEMA,
     )
+
+
+def _remove_services(hass: HomeAssistant) -> None:
+    """Remove Holdsport services."""
+    for service in (
+        SERVICE_EXECUTE_ACTIVITY_ACTION,
+        SERVICE_ADD_ACTIVITY_COMMENT,
+        SERVICE_ADD_ACTIVITY_RIDE,
+        SERVICE_REMOVE_ACTIVITY_RIDE,
+        SERVICE_ASSIGN_ACTIVITY_TASK,
+    ):
+        if hass.services.has_service(DOMAIN, service):
+            hass.services.async_remove(DOMAIN, service)

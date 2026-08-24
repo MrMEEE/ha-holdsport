@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 import logging
 from typing import Any
@@ -51,12 +52,19 @@ class HoldsportDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         notes = await _safe("notes", self.client.async_get_notes(team_id))
 
         tasks_map: dict[str, list[dict[str, Any]]] = {}
+        activity_ids: list[str] = []
+        task_coroutines: list[Any] = []
         for activity in activities:
             activity_id = activity.get("id")
             if activity_id is None:
                 continue
-            tasks = await _safe("activity_tasks", self.client.async_get_activity_tasks(int(activity_id)))
-            tasks_map[str(activity_id)] = tasks
+            activity_ids.append(str(activity_id))
+            task_coroutines.append(
+                _safe("activity_tasks", self.client.async_get_activity_tasks(int(activity_id)))
+            )
+        if task_coroutines:
+            task_results = await asyncio.gather(*task_coroutines)
+            tasks_map = dict(zip(activity_ids, task_results, strict=True))
 
         return {
             "activities": activities,

@@ -12,6 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN
 from .coordinator import HoldsportDataUpdateCoordinator
@@ -154,14 +155,17 @@ class HoldsportTeamNextActivitySensor(HoldsportTeamBaseEntity):
     def _next_activity(self) -> dict[str, Any] | None:
         activities = self.coordinator.data.get("activities", {}).get(self._team_id, [])
         best: tuple[datetime, dict[str, Any]] | None = None
+        now = dt_util.utcnow()
 
         for activity in activities:
             start = activity.get("starttime")
             if not start:
                 continue
-            try:
-                start_time = datetime.fromisoformat(start)
-            except ValueError:
+            start_time = dt_util.parse_datetime(start)
+            if start_time is None:
+                continue
+            start_time = dt_util.as_utc(start_time)
+            if start_time < now:
                 continue
             if best is None or start_time < best[0]:
                 best = (start_time, activity)
