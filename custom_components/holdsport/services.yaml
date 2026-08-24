@@ -1,0 +1,125 @@
+execute_activity_action:
+  name: Execute activity action
+  description: Execute one of the currently available actions for a team activity.
+  fields:
+    entry_id:
+      required: false
+      example: "abcdef123456"
+      selector:
+        text:
+    team_id:
+      required: true
+      example: 6237
+      selector:
+        number:
+          min: 1
+          mode: box
+    activity_id:
+      required: true
+      example: 256593
+      selector:
+        number:
+          min: 1
+          mode: box
+    action_index:
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+          mode: box
+
+add_activity_comment:
+  name: Add activity comment
+  description: Add a comment to an activity.
+  fields:
+    entry_id:
+      required: false
+      selector:
+        text:
+    activity_id:
+      required: true
+      example: 273260
+      selector:
+        number:
+          min: 1
+          mode: box
+    comment:
+      required: true
+      example: "I'll be 5 minutes late"
+      selector:
+        text:
+
+add_activity_ride:
+  name: Add activity ride
+  description: Offer seats for a ride to an activity.
+  fields:
+    entry_id:
+      required: false
+      selector:
+        text:
+    activity_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    seats:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    comment:
+      required: false
+      example: "Blue VW"
+      selector:
+        text:
+
+remove_activity_ride:
+  name: Remove activity ride
+  description: Remove a ride offer from an activity.
+  fields:
+    entry_id:
+      required: false
+      selector:
+        text:
+    activity_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    ride_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+assign_activity_task:
+  name: Assign activity task
+  description: Assign an activity task for current user or another user.
+  fields:
+    entry_id:
+      required: false
+      selector:
+        text:
+    activity_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    task_type_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    user_id:
+      required: false
+      selector:
+        number:
+          min: 1
+          mode: box

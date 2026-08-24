@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Holdsport",
+        "description": "Enter your Holdsport username and password.",
+        "data": {
+          "username": "Username (or managed profile ID)",
+          "password": "Password",
+          "update_interval": "Update interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid authentication",
+      "cannot_connect": "Failed to connect",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This account is already configured"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "user_name": {
+        "name": "User"
+      },
+      "team_next_activity": {
+        "name": "Next activity"
+      },
+      "team_activities_count": {
+        "name": "Activities"
+      },
+      "team_members_count": {
+        "name": "Members"
+      },
+      "team_notes_count": {
+        "name": "Notes"
+      }
+    }
+  }
+}
